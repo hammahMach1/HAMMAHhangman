@@ -1,16 +1,147 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+import random
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+def get_word():
+    words = ["python", "java", "swift", "javascript", "hangman", "programming", "developer", "algorithm", "function"]
+    return random.choice(words)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def display_hangman(tries):
+    stages = [  # final state: head, torso, both arms, and both legs
+        """
+       --------
+       |      |
+       |      O
+       |     \\|/
+       |      |
+       |     / \\
+       -
+    """,
+        # head, torso, both arms, and one leg
+        """
+       --------
+       |      |
+       |      O
+       |     \\|/
+       |      |
+       |     / 
+       -
+    """,
+        # head, torso, and both arms
+        """
+       --------
+       |      |
+       |      O
+       |     \\|/
+       |      |
+       |      
+       -
+    """,
+        # head, torso, and one arm
+        """
+       --------
+       |      |
+       |      O
+       |     \\|
+       |      |
+       |     
+       -
+    """,
+        # head and torso
+        """
+       --------
+       |      |
+       |      O
+       |      |
+       |      |
+       |     
+       -
+    """,
+        # head
+        """
+       --------
+       |      |
+       |      O
+       |    
+       |      
+       |     
+       -
+    """,
+        # initial empty state
+        """
+       --------
+       |      |
+       |      
+       |    
+       |      
+       |     
+       -
+    """
+    ]
+    return stages[tries]
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+def play(word):
+    word_completion = "_" * len(word)  # string with underscores representing the word to guess
+    guessed = False  # boolean to indicate if the word has been guessed
+    guessed_letters = []  # list to keep track of letters guessed
+    guessed_words = []  # list to keep track of words guessed
+    tries = 6  # number of tries the player has
+
+    print("Let's play Hangman!")
+    print(display_hangman(tries))
+    print(word_completion)
+    print("\n")
+
+    while not guessed and tries > 0:
+        guess = input("Please guess a letter or word: ").lower()
+        if len(guess) == 1 and guess.isalpha():
+            if guess in guessed_letters:
+                print("You already guessed the letter", guess)
+            elif guess not in word:
+                print(guess, "is not in the word.")
+                tries -= 1
+                guessed_letters.append(guess)
+            else:
+                print("Good job,", guess, "is in the word!")
+                guessed_letters.append(guess)
+                word_as_list = list(word_completion)
+                indices = [i for i, letter in enumerate(word) if letter == guess]
+                for index in indices:
+                    word_as_list[index] = guess
+                word_completion = "".join(word_as_list)
+                if "_" not in word_completion:
+                    guessed = True
+        elif len(guess) == len(word) and guess.isalpha():
+            if guess in guessed_words:
+                print("You already guessed the word", guess)
+            elif guess != word:
+                print(guess, "is not the word.")
+                tries -= 1
+                guessed_words.append(guess)
+            else:
+                guessed = True
+                word_completion = word
+        else:
+            print("Not a valid guess.")
+
+        print(display_hangman(tries))
+        print(word_completion)
+        print("\n")
+
+    if guessed:
+        print("Congrats, you guessed the word! You win!")
+    else:
+        print("Sorry, you ran out of tries. The word was " + word + ". Maybe next time!")
+
+
+def main():
+    word = get_word()
+    play(word)
+    while input("Play Again? (Y/N) ").upper() == "Y":
+        word = get_word()
+        play(word)
+
+
+if __name__ == "__main__":
+    main()
